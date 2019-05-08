@@ -1,0 +1,90 @@
+@startuml
+package "dIAgnoseNet API Library" {
+  [diagnosenet_datamining] - [diagnosenet_embedding]
+  [diagnosenet_embedding] - [diagnosenet_supervised]
+}
+
+
+cloud "../healtdata/" {
+
+  database "PMSI_PACA" {
+    artifact EHR_2008
+
+  }
+
+  database "CDA_serialization" {
+    note left of cda.json: if not exists
+  }
+
+  database "vocabularies_repository" {
+    artifact x.._
+    artifact x1_
+
+  }
+
+  Folder "sandbox_pre_trained" {
+    database "1_Mining_Stage" {
+      frame "binary_representation" {
+      }
+      frame "BPPR_valid" {
+      }
+      frame "BPPR_train" {
+      }
+      frame "BPPR_test" {
+      }
+    }
+
+    database "2_Unsupervised_Stage" {
+      frame "LPPR_valid" {
+      }
+      frame "LPPR_train" {
+      }
+      frame "LPPR_test" {
+      }
+    }
+
+    database "3_Supervised_Stage" {
+      frame "randomforest" {
+        frame "predictions_train" {
+        }
+        frame "predictions_valid" {
+        }
+        frame "predictions_test" {
+        }
+      }
+    }
+
+  }
+
+}
+
+
+[diagnosenet_datamining] <-- EHR_2008
+EHR_2008 ..> cda.json
+[diagnosenet_datamining] --> cda.json
+binary_representation <.. cda.json
+
+[diagnosenet_datamining] --> binary_representation
+vocabularies_repository -left-->[diagnosenet_datamining]
+vocabularies_repository -left..> binary_representation
+binary_representation ..> BPPR_train
+binary_representation ..> BPPR_valid
+binary_representation ..> BPPR_test
+
+1_Mining_Stage --> [diagnosenet_embedding]
+BPPR_train ..> LPPR_train
+BPPR_valid ..> LPPR_valid
+BPPR_test ..> LPPR_test
+
+[diagnosenet_embedding] --> 2_Unsupervised_Stage
+
+LPPR_train ..> predictions_train
+LPPR_valid ..> predictions_valid
+LPPR_test ..> predictions_test
+
+[diagnosenet_supervised] <-- 1_Mining_Stage
+[diagnosenet_supervised] <-- 2_Unsupervised_Stage
+[diagnosenet_supervised] --> 3_Supervised_Stage
+
+
+@enduml
