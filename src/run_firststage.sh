@@ -94,17 +94,16 @@ mkdir $TESTBED_Dir/$TESTBED_ARGV
 ###-----------------------------------------------------------------------------#
 ###     Identification of the GPU in the machine
 ###-----------------------------------------------------------------------------#
-i=0; for id in $(nvidia-smi | grep 0000 | awk '{print $8}'); do GPU[$i]=$id; i=$i+1; done;
-if [ ${#GPU[@]} == 1 ]; then
+##i=0; for id in $(nvidia-smi | grep 0000 | awk '{print $8}'); do GPU[$i]=$id; i=$i+1; done;
+##if [ ${#GPU[@]} == 1 ]; then
     ## Executes the enerGyPU_record.sh
-    ../enerGyPU/dataCapture/enerGyPU_record-desktop.sh $TESTBED_Dir $TESTBED_ARGV &
-elif [ ${#GPU[@]} == 8 ]; then
+##    ../enerGyPU/dataCapture/enerGyPU_record-desktop.sh $TESTBED_Dir $TESTBED_ARGV &
+##elif [ ${#GPU[@]} == 8 ]; then
     ## Executes the enerGyPU_record.sh
-    ../enerGyPU/dataCapture/enerGyPU_record-cluster.sh $TESTBED_Dir $TESTBED_ARGV &
-else
-    echo "++ no NVIDIA GPU detected ++"
-fi
-
+##    ../enerGyPU/dataCapture/enerGyPU_record-cluster.sh $TESTBED_Dir $TESTBED_ARGV &
+##else
+##    echo "++ no NVIDIA GPU detected ++"
+##fi
 ###     End enerGyPU Monitor Parameters Configuration
 #################################################################################
 
@@ -130,6 +129,6 @@ echo "+++ Using the BPPR from exists directory: "$SANDBOX" +++"
 echo "------------------------------------------------------------------------"
 fi
 
-kill %1
+##kill %1
 ###     End dIAgnoseNET executions
 #################################################################################
