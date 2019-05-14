@@ -89,7 +89,7 @@ alias python=/usr/bin/python2.7
 ###-----------------------------------------------------------------------------#
 ###     Global variables to setting the Testbed
 ###-----------------------------------------------------------------------------#
-mkdir $TESTBED_Dir/$TESTBED_ARGV
+#mkdir $TESTBED_Dir/$TESTBED_ARGV
 
 ###-----------------------------------------------------------------------------#
 ###     Identification of the GPU in the machine
