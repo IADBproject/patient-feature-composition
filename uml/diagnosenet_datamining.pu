@@ -1,0 +1,104 @@
+@startuml
+
+class diagnosenet_datamining {
+  + dataset_dir
+  + features_name
+  + rawdata_name
+  + sandbox
+  + year
+  - Dir_rawdata
+  __main()__
+  + loadICUData()
+  .. FeaturesComposition ..
+  + _write_featuresSerialized()
+  + _read_featuresSerialized()
+  .. DocumentTermMatrix ..
+  + _build_binaryPhenotype()
+  + _write_binaryPhenotype()
+  .. LabelComposition ..
+  + _get_PrimaryMorbidityLabel()
+  + _build_BinaryPrimaryMorbidity()
+  + _write_PrimaryMorbidityLabel()
+
+}
+
+class diagnosenet_featurescomposition {
+  + dataset_dir
+  + features_name
+  + sandbox
+  + year
+  __
+  + _set_featuresSerializer()
+  + _get_featuresSerialized()
+  + _write_featuresSerialized()
+  + _read_featuresSerialized()
+}
+
+class diagnosenet_cdajson {
+  + dataset_dir
+  + sandbox
+  + year
+  __
+  + _get_clinicalprocedures()
+  + cdaSchemaM24()
+}
+
+class diagnosenet_featuresengineerig {
+  + _set_AgeGroup()
+  ! _set_ICD-10Group()
+  ! _set_CCAMGroup()
+}
+
+class diagnosenet_dtm {
+  + features_name
+  + sandbox
+  + year
+  - localdir
+  - binary_PPR
+  __
+  + _get_cleanValues()
+  + _get_binaryRecord()
+  + _build_binaryPhenotype()
+  + _write_binaryPhenotype()
+}
+
+class diagnosenet_vocabularycomposition {
+  + features_name
+  + sandbox
+  + year
+  __
+  + _dynamic_Vocabulary()
+  + _set_dynamicVocabulary()
+  + _write_dynamicVocabulary()
+  + _set_customVocabulary()
+  + _custom_Vocabulary()
+}
+
+class diagnosenet_labelcomposition {
+  + features_name
+  + sandbox
+  + year
+  - localdir
+  - pm_Dictionary
+  - pm_label
+  - binary_label
+  __
+  + _set_primaryMorbidityDictionary()
+  + _get_PrimaryMorbidityLabel()
+  + _build_BinaryPrimaryMorbidity()
+  + _write_PrimaryMorbidityLabel()
+  + _set_clinicalProceduresVoc()
+  + _build_clinicalProcedures()
+  + _write_clinicalProceduresLabel()
+}
+
+diagnosenet_datamining -- diagnosenet_featurescomposition : > uses
+diagnosenet_featurescomposition "1" *-- "many" diagnosenet_cdajson : contains
+diagnosenet_cdajson <|-- diagnosenet_featuresengineerig : define rules
+
+diagnosenet_datamining -- diagnosenet_dtm : > uses
+diagnosenet_dtm o-- diagnosenet_vocabularycomposition : > uses
+
+diagnosenet_datamining -- diagnosenet_labelcomposition : > uses
+
+@enduml
