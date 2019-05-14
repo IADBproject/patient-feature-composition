@@ -14,7 +14,7 @@ import pandas as pd
 import time
 
 
-class FeaturesEngineeringRules(object):
+class FeaturesEngineeringRules:
 	"""
 	This class specified the rules for grouping values of patient features
 	to create an additional (engineered) features in a phenotype representation

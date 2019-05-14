@@ -25,11 +25,11 @@ from collections import OrderedDict
 #nltk.download()
 
 ## dIAgnoseNET library
-from diagnosenet_featuresengineerig import FeaturesEngineeringRules
-from diagnosenet_cdajson import cdaJSON
+from diagnosenet.featuresengineerig import FeaturesEngineeringRules
+from diagnosenet.cdajson import cdaJSON
 logger = logging.getLogger('_dIAgnoseNET_DataMining')
 
-class FeaturesComposition(object):
+class FeaturesComposition:
 	"""
 	Features Composition to extract patient's attributes for driving
 	their phenotype representation from Intensive Care Unit (ICU) PMSI-PACA

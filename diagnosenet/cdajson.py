@@ -19,10 +19,10 @@ import json
 from ast import literal_eval
 
 ## dIAgnoseNET API
-from diagnosenet_featuresengineerig import FeaturesEngineeringRules
+from diagnosenet.featuresengineerig import FeaturesEngineeringRules
 
 
-class cdaJSON(object):
+class cdaJSON:
 	"""
 	CDA is a document that consists of a header and body, It is build in a JSON format:
 	** Header: Includes patient information, author, creation date,

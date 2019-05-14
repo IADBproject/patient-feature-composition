@@ -17,9 +17,11 @@
 ###-----------------------------------------------------------------------------#
 ANN_NAME="deep_patient"
 FEATURES_NAME="CUSTOM_x1_x2_x3_x4_x5_x7_x83_Y1"
-DATASET_Dir="../healthData/"
+#DATASET_Dir="../healthData/"
+DATASET_Dir="healthData/"
 RAWDATA_NAME="PMSI-PACA"
-SANDBOX="../healthData/sandbox-"$FEATURES_NAME
+#SANDBOX="../healthData/sandbox-"$FEATURES_NAME
+SANDBOX="healthData/sandbox-"$FEATURES_NAME
 YEAR="2008"
 
 ###-----------------------------------------------------------------------------#

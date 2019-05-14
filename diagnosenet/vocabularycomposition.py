@@ -32,7 +32,7 @@ from nltk import FreqDist
 ## dIAgnoseNET library
 logger = logging.getLogger('_dIAgnoseNET_DataMining')
 
-class VocabularyComposition(object):
+class VocabularyComposition:
 	"""
 	Used this class for building a Medical Vocabulary
 	from feature composition groups PMSI-PACA (features_serializations)

@@ -9,9 +9,10 @@
 import logging
 import logging.handlers
 
-class LoggingConfig(object):
+
+class Config:
     """
-    Class for logging config and access to all method in dIAgnoseNET library.
+    Logging config allows the access to all methods in DiagnoseNET framework.
     """
 
     def __init__(self):

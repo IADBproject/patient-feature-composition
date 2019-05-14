@@ -18,11 +18,11 @@ import sklearn
 from sklearn.cross_validation import train_test_split
 
 ## dIAgnoseNET library
-from diagnosenet_vocabularycomposition import VocabularyComposition
+from diagnosenet.vocabularycomposition import VocabularyComposition
 logger = logging.getLogger('_dIAgnoseNET_UnsupervisedEmbedding')
 
 
-class SplitPoint(object):
+class SplitPoint:
 	"""
 	Split the binary patient phenotype representation
 	and write in data_train, data_valid, data_test

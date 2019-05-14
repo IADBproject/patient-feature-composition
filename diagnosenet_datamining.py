@@ -15,14 +15,14 @@ import time
 import logging
 
 ## dIAgnoseNET library
-from diagnosenet_featurescomposition import FeaturesComposition
-from diagnosenet_dtm import DocumentTermMatrix
-from diagnosenet_vocabularycomposition import VocabularyComposition
-from diagnosenet_labelcomposition import LabelComposition
-from diagnosenet_loggingconfig import LoggingConfig
+from diagnosenet.featurescomposition import FeaturesComposition
+from diagnosenet.dtm import DocumentTermMatrix
+from diagnosenet.vocabularycomposition import VocabularyComposition
+from diagnosenet.labelcomposition import LabelComposition
+from diagnosenet.logger import Config
 logger = logging.getLogger('_dIAgnoseNET_DataMining')
 
-class _dIAgnoseNET_DataMining(object):
+class _dIAgnoseNET_DataMining:
 	"""
 	_dIAgnoseNet_DataMinig is a feature extraction library to build a
 	general purpose patient phenotype in a binary representation
@@ -122,7 +122,7 @@ def main(argv):
 
 		#######################################################################
 		### Set general logging configuration for using in _dIAgnoseNET_DataMining
-	 	logging_config= LoggingConfig()
+	 	logging_config = Config()
 		logging_config._setup_logger('_dIAgnoseNET_DataMining',
 				str(sandbox+local_dir+'/diagnosenet_datamining.log'), logging.DEBUG)
 

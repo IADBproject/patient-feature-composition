@@ -30,7 +30,7 @@ from collections import OrderedDict
 ## dIAgnoseNET library
 logger = logging.getLogger('_dIAgnoseNET_DataMining')
 
-class LabelComposition(object):
+class LabelComposition:
 	"""
 	This class get the medical target from the CDA schema in a JSON format
 	to build a one-hot vector representation.

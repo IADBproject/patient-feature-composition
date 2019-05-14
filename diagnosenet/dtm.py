@@ -30,11 +30,11 @@ from nltk import FreqDist
 #nltk.download()
 
 ## dIAgnoseNET library
-from diagnosenet_vocabularycomposition import VocabularyComposition
+from diagnosenet.vocabularycomposition import VocabularyComposition
 logger = logging.getLogger('_dIAgnoseNET_DataMining')
 
 
-class DocumentTermMatrix(object):
+class DocumentTermMatrix:
 	"""
 	This class build a binary petient phenotype representation from their features selected.
 	The rows correspond to patient phenotype (or profile)
