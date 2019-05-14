@@ -1,4 +1,5 @@
-## Raw clinical descriptors
+i## Raw clinical descriptors
 healthData/CDA_Serialization/*
 healthData/PMSI-PACA/*
 healthData/vocabularies_repository/*
+diagnosenet/*.pyc
