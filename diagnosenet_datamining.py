@@ -122,7 +122,7 @@ def main(argv):
 
 		#######################################################################
 		### Set general logging configuration for using in _dIAgnoseNET_DataMining
-		logging_config = Config()
+	 	logging_config = Config()
 		logging_config._setup_logger('_dIAgnoseNET_DataMining',
 				str(sandbox+local_dir+'/diagnosenet_datamining.log'), logging.DEBUG)
 
@@ -281,10 +281,10 @@ def main(argv):
 
 		#######################################################################
 		### Set Default Parameters
-		dataset_dir = "healthData/"
+		dataset_dir = "../healthData/"
 		features_name = "pre-trained"
 		rawdata_name = "PMSI-PACA"
-		sandbox = str("healthData/sandbox-")+str(features_name)
+		sandbox = str("../healthData/sandbox-")+str(features_name)
 		year = "2008"
 		Dir_rawdata = str(dataset_dir+"/"+rawdata_name+"/")
 		local_dir = "/1_Mining-Stage/"
@@ -321,14 +321,14 @@ def main(argv):
 
 		#######################################################################
 		### Set general logging configuration for using in _dIAgnoseNET_DataMining
-		logging_config = Config()
-                logging_config._setup_logger('_dIAgnoseNET_DataMining',
-                                str(sandbox+local_dir+'/diagnosenet_datamining.log'), logging.DEBUG)
+		logging_config = LoggingConfig()
+		logging_config._setup_logger('_dIAgnoseNET_DataMining',
+				str(sandbox+local_dir+'/diagnosenet_datamining.log'), logging.DEBUG)
 
-                logger = logging.getLogger('_dIAgnoseNET_DataMining') ## Declare the same logging name
-                logger.info('---------------------------------------------------------')
-                logger.warning('!!! Using Parameters configured in run_*.sh !!!')
-                logger.info('---------------------------------------------------------')
+		logger = logging.getLogger('_dIAgnoseNET_DataMining') ## Declare the same logging name
+		logger.info('---------------------------------------------------------')
+		logger.warning('!!! Using Default Directories as Parameters !!!')
+		logger.info('---------------------------------------------------------')
 
 		#######################################################################
 		### Starting _dIAgnoseNET_DataMining and load row data
