@@ -75,59 +75,6 @@ class cdaJSON:
 		return x9
 
 
-	def cdaMimic(self, icu_rsa, id_record):
-    	#####################################################
-		## Get the EHR_Features-Patient Matrix for each year
-		## Indexing by number of row patient record
-		record = icu_rsa.reindex([id_record])
-
-		### x1_demographics
-		x11 = record.iloc[:,3].astype('str').values	 	### AGE
-		x12 = record.iloc[:,9].astype('str').values		### DOB
-		x13 = record.iloc[:,33].astype('str').values	### Marital status
-		x14 = record.iloc[:,34].astype('str').values	### Ethnicity
-
-		### x2_admission_details
-		x21 = record.iloc[:,27].astype('str').values	### input_mode
-		x22 = record.iloc[:,28].astype('str').values	### input_source
-		x23 = record.iloc[:,29].astype('str').values	### previous_state
-		x24 = record.iloc[:,30].astype('str').values	### first_week
-		x25 = record.iloc[:,8].astype('str').values		### first_week
-
-		### x3_hospitalization_details
-		x35 = record.iloc[:,62].astype('str').values	### first_week
-		x36 = record.iloc[:,63].astype('str').values	### first_week
-		x37 = record.iloc[:,68].astype('str').values	### first_week
-		x38 = record.iloc[:,85].astype('str').values	### first_week
-
-		######################################################################
-		### Serialize each record to create a clinical document in JSON format
-		### SSR_Methodologique_2016
-		cda_record = {
-					'x1_demographics': {
-						'gender': x11[0],
-						'age': x12[0],
-						'marital_status': x13[0],
-						'ethnicity': x14[0],
-					},
-					'x2_admission_details': {
-						'admission_type': x21[0],
-						'admission_location': x22[0],
-						'discharge_location': x23[0],
-						'insurance': x24[0],
-						'expire_flag': x25[0]
-					},
-					'x3_hospitalization_details': {
-						'icu_first_careunit': x35[0],
-						'icu_last_careunit': x36[0],
-						'icu_los': x37[0],
-						'procedure': x38[0]
-					}
-				}
-
-		return cda_record
-    		
-
 	def cdaSchemaM24(self, icu_rsa, id_record):
 		#####################################################
 		## Get the EHR_Features-Patient Matrix for each year

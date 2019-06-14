@@ -70,7 +70,7 @@ class FeaturesComposition:
 		## building the clinical document schema record by record loaded in 'icu_rsa'
 		features_serialized = {
 								#"clinicalDocument": [(cda.cdaSchemaM24(icu_rsa, i)) for i in range( 100 ) ]
-								"clinicalDocument": [(cda.cdaMimic(icu_rsa, i)) for i in range( icu_rsa.shape[0] ) ]
+								"clinicalDocument": [(cda.cdaSchemaM24(icu_rsa, i)) for i in range( icu_rsa.shape[0] ) ]
 								}
 
 		## Clinical document structured in JSON format
@@ -78,7 +78,7 @@ class FeaturesComposition:
 
 		## Used return 'cda_serialized' for working	with raw CDA in JSON format
 		#cda_serialized = self.cinical_document
-		return self.cinical_document
+		#return self.cinical_document
 
 
 	def _get_featuresSerialized(self, icu_rsa):
@@ -121,7 +121,7 @@ class FeaturesComposition:
 
 		# Set the EHR_Features-Patient Matrix for each year
 		self._set_featuresSerializer(icu_rsa)
-		file_name = str(self.dataset_dir+'/CDA_Serialization/'+'clinical_document_mimic-'+self.year+'.json')
+		file_name = str(self.dataset_dir+'/CDA_Serialization/'+'clinical_document-'+self.year+'.json')
 		##with open(self.dataset_dir+'/CDA_Serialization/'+'clinical_document-'+self.year+'.json', 'w+') as f:
 		##with open(self.sandbox+'/1_Mining-Stage/features_serialization/'+'clinical_document-'+self.year+'.json', 'w+') as f:
 		with open(file_name, 'w+') as f:
@@ -140,7 +140,7 @@ class FeaturesComposition:
 		logger.info('-- Read the Clinical Document Architecture in a JSON Format --')
 
 		## load the clinical_document-year-.json
-		file_name = str(self.dataset_dir+'/CDA_Serialization/'+'clinical_document_mimic-'+self.year+'.json')
+		file_name = str(self.dataset_dir+'/CDA_Serialization/'+'clinical_document-'+self.year+'.json')
 		#file_name = str(self.sandbox+'/1_Mining-Stage/features_serialization/'+'clinical_document-'+self.year+'.json')
 		logger.info('-- Path of CDA Records: {}--'.format(file_name))
 
