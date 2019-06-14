@@ -2,4 +2,5 @@
 healthData/CDA_Serialization/*
 healthData/PMSI-PACA/*
 healthData/vocabularies_repository/*
+healthData/*
 diagnosenet/*.pyc
