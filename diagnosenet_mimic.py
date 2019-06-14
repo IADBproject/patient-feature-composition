@@ -65,24 +65,23 @@ class _dIAgnoseNET_DataMining:
 		logger.info('-- Sandbox directory: {} --'.format(self.sandbox))
 		logger.info('-- Year {} --'.format(self.year))
 
-
 	### PMSI-PACA ICU load files used at the Intensive Care Unit
 	def loadICUData(self):
 		load_time = time.time()
-		icu_rsa=pd.read_csv(self.Dir_rawdata+self.year+"/"+str("ssr-fix-"+self.year+"-dev.txt"),
-					header=0,sep=";",encoding='latin-1',dtype="str")
-		code_diagnosis=pd.read_csv(self.Dir_rawdata+"/sc/"+str("libCIM10-DiseasesGroup.csv"),
+		# raw_data = 'pt_adm_icu_outevs_charevs_290519.csv'
+		raw_data = 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
+		icu_rsa=pd.read_csv(self.Dir_rawdata+self.year+"/"+str(raw_data),
 					header=0,sep=",",encoding='latin-1',dtype="str")
 
 		### Merge SSR_fix with the new Primary Morbidty Composition 'Classes Disease Group'
-		primary_Composition=pd.merge(icu_rsa, code_diagnosis, left_on='affect_etiol', right_on='Diagnose')
+		#;primary_Composition=pd.merge(icu_rsa, code_diagnosis, left_on='affect_etiol', right_on='Diagnose')
 		logger.info('---------------------------------------------------------')
 		logger.info('++ Load Data for ICU-{} ++'.format(str(self.year)))
 		logger.info('-- SSR_FIX: {} --'.format(str(icu_rsa.shape)))
-		logger.info('-- ICD-10 Codes: {} --'.format(str(code_diagnosis.shape)))
+		# logger.info('-- ICD-10 Codes: {} --'.format(str(code_diagnosis.shape)))
 		##logger.info('-- Primary Composition: %s ---"% str(primary_Composition.shape) )
 		logger.debug('* Data load time: {} (SPY) *'.format((time.time() - load_time)))
-		return primary_Composition
+		return icu_rsa
 
 
 def main(argv):
@@ -122,7 +121,7 @@ def main(argv):
 
 		#######################################################################
 		### Set general logging configuration for using in _dIAgnoseNET_DataMining
-		logging_config = Config()
+	 	logging_config = Config()
 		logging_config._setup_logger('_dIAgnoseNET_DataMining',
 				str(sandbox+local_dir+'/diagnosenet_datamining.log'), logging.DEBUG)
 
@@ -179,7 +178,7 @@ def main(argv):
 										x2_name.split(','),x3_name.split(','),x4_name.split(','),
 										x5_name.split(','),x6_name.split(','),x7_name.split(','),
 										x8_name.split(','),x9_name.split(','),x10_name.split(','))
-
+		### Static enviroment
 		else:
 			logger.info('---------------------------------------------------------')
 			logger.info('++ Dynamic Vocabulary ++')
@@ -271,7 +270,7 @@ def main(argv):
 		##logger.info('-- Testbed Directory: {} *'.format(tesbed_file))
 
 
-	### Using default directory "../healthData/sandbox-pre-trained"
+	### Using default directory "healthData/sandbox-pre-trained"
 	else:
 		#######################################################################
 		## Counter to measure the execution time of diagnosenet_datamining
@@ -283,28 +282,28 @@ def main(argv):
 		### Set Default Parameters
 		dataset_dir = "healthData/"
 		features_name = "pre-trained"
-		rawdata_name = "PMSI-PACA"
+		rawdata_name = "MIMIC"
 		sandbox = str("healthData/sandbox-")+str(features_name)
-		year = "2008"
+		year = "2019"
 		Dir_rawdata = str(dataset_dir+"/"+rawdata_name+"/")
 		local_dir = "/1_Mining-Stage/"
-		vocabulary_type = "custom"
+		#vocabulary_type = "custom"
+		vocabulary_type = None
 		##vocabulary_type = "None"
 		medicaltarget = 'y1'
 
 		#######################################################################
 		### Select the features to build a binary patient phenotype
-		#x1_name = ['age','sexe','age_group','activity','postal_code']
-		x1_name = ['sexe','age_group','activity']
-		##x1_name=None
-		x2_name = ['input_mode','input_source','previous_state','first_week']
-		##x2_name=None
-		x3_name = ['numdays_hospitalized','sequence_number','surgery_time']
-		##x3_name=None
-		x4_name = ['dressing', 'feeding', 'displacement', 'continence' ]
-		##x4_name=None
-		x5_name = ['communication', 'comportement']
-		##x5_name=None
+		### Demographical information
+		x1_name = ['gender', 'age', 'marital_status', 'ethnicity']
+		### Admission details
+		x2_name = ['admission_type', 'admission_location', 'discharge_location', 'insurance', 'expire_flag']
+		### Hospitalization details
+		x3_name = ['icu_first_careunit', 'icu_last_careunit', 'icu_los', 'procedure']
+		# x4_name = ['dressing', 'feeding', 'displacement', 'continence' ]
+		x4_name=None
+		# x5_name = ['communication', 'comportement']
+		x5_name=None
 		# x6_name = ['mechanical_rehab', 'motorsensory_rehab', 'neuropsychological_rehab',
 		#    		'cardiorespiratory_rehab', 'nutritional_rehab', 'urogenitalsphincter_rehab',
 		#   		'kidneys_rehab', 'electrical_equipment', 'collective-rehab',
@@ -349,24 +348,25 @@ def main(argv):
 
 		### Features Serializer in a Clinical Document Architecture as JSON formet
 		featurescomposition = FeaturesComposition(dataset_dir, features_name, sandbox, year)
-		#featurescomposition._set_featuresSerializer(icu_rsa)
+		cda_object = featurescomposition._write_featuresSerialized(icu_rsa)
+		print(cda_object)
 		#cda_object = featurescomposition._get_featuresSerialized(icu_rsa)
 
 		## The CDA features serialization to write one time
 		## Check if the clinical document exists
-		cda_name = str(dataset_dir+'/CDA_Serialization/'+'clinical_document-'+year+'.json')
-		if not os.path.exists(cda_name):
-			featurescomposition._write_featuresSerialized(icu_rsa)
-		cda_object = featurescomposition._read_featuresSerialized()
-		logger.info('-- Number of CDA Records: [{}] --'.format(len(cda_object)))
+		# cda_name = str(dataset_dir+'/CDA_Serialization/'+'clinical_document_mimic-'+year+'.json')
+		# if not os.path.exists(cda_name):
+		# 	featurescomposition._write_featuresSerialized(icu_rsa)
+		# cda_object = featurescomposition._read_featuresSerialized()
+		# logger.info('-- Number of CDA Records: [{}] --'.format(len(cda_object)))
 
 		## End counter to Features Composition
 		time_featurescomposition = time.time() - counter_fc
 		logger.debug('* Features Composition Time: {} *'.format(time_featurescomposition))
 
 
-		#######################################################################
-		## Counter to Vocabulary Composition
+		# #######################################################################
+		# ## Counter to Vocabulary Composition
 		counter_vc = time.time()
 		if vocabulary_type == 'custom':
 			logger.info('---------------------------------------------------------')
@@ -393,60 +393,60 @@ def main(argv):
 		logger.debug('* Vocabulary Composition Time: {} *'.format(time_vocabulary))
 
 
-		#######################################################################
-		## Counter to Binary representation include Vocabulary Load or Built
-		counter_br = time.time()
+		# #######################################################################
+		# ## Counter to Binary representation include Vocabulary Load or Built
+		# counter_br = time.time()
 
-		## Build a binary petient phenotype representation using Document-term Matrix
-		dtm = DocumentTermMatrix(dataset_dir, features_name, sandbox, year)
-		binarypatient = dtm._build_binaryPhenotype(cda_object,x1_name,x2_name,x3_name,
-						x4_name, x5_name, x6_name, x7_name, x8_name, x9_name, x10_name,
-						voc_x1,voc_x2,voc_x3,voc_x4,voc_x5,voc_x6,voc_x7,voc_x8,voc_x9,voc_x10)
+		# ## Build a binary petient phenotype representation using Document-term Matrix
+		# dtm = DocumentTermMatrix(dataset_dir, features_name, sandbox, year)
+		# binarypatient = dtm._build_binaryPhenotype(cda_object,x1_name,x2_name,x3_name,
+		# 				x4_name, x5_name, x6_name, x7_name, x8_name, x9_name, x10_name,
+		# 				voc_x1,voc_x2,voc_x3,voc_x4,voc_x5,voc_x6,voc_x7,voc_x8,voc_x9,voc_x10)
 
-		len_BPPR = dtm._write_binaryPhenotype()
-		logger.info('-- Lenght of BPPR: [{}] --'.format(len_BPPR))
+		# len_BPPR = dtm._write_binaryPhenotype()
+		# logger.info('-- Lenght of BPPR: [{}] --'.format(len_BPPR))
 
-		## End Counter to Binary representation
-		time_binaryrepresentation = time.time() - counter_br
-		logger.debug('* Binary Representation Time: {} *'.format(time_binaryrepresentation))
+		# ## End Counter to Binary representation
+		# time_binaryrepresentation = time.time() - counter_br
+		# logger.debug('* Binary Representation Time: {} *'.format(time_binaryrepresentation))
 
 
-		#######################################################################
-		## Counter to label Composition
-		counter_lc = time.time()
+		# #######################################################################
+		# ## Counter to label Composition
+		# counter_lc = time.time()
 
-		### Label Composition
-		label_composition = LabelComposition(features_name, sandbox, year)
-		if medicaltarget == 'y1':
-			logger.info('---------------------------------------------------------')
-			logger.info('++ Medical Target Y1 ++')
-			label_composition._get_PrimaryMorbidityLabel(cda_object)
-			label_composition._build_BinaryPrimaryMorbidity()
-			pm_lenght = label_composition._write_PrimaryMorbidityLabel()
-			logger.info('-- Number of Y1 multilabels: [{}] --'.format(pm_lenght))
+		# ### Label Composition
+		# label_composition = LabelComposition(features_name, sandbox, year)
+		# if medicaltarget == 'y1':
+		# 	logger.info('---------------------------------------------------------')
+		# 	logger.info('++ Medical Target Y1 ++')
+		# 	label_composition._get_PrimaryMorbidityLabel(cda_object)
+		# 	label_composition._build_BinaryPrimaryMorbidity()
+		# 	pm_lenght = label_composition._write_PrimaryMorbidityLabel()
+		# 	logger.info('-- Number of Y1 multilabels: [{}] --'.format(pm_lenght))
 
-		elif medicaltarget == 'y2':
-			logger.info('---------------------------------------------------------')
-			logger.info('++ Medical Target Y2 ++')
-			label_composition._set_clinicalProceduresVoc(cda_object)
-			label_composition._build_clinicalProcedures(cda_object)
-			cp_lenght = label_composition._write_clinicalProceduresLabel()
-			logger.info('-- Number of Y2 multilabels: [{}] --'.format(cp_lenght))
+		# elif medicaltarget == 'y2':
+		# 	logger.info('---------------------------------------------------------')
+		# 	logger.info('++ Medical Target Y2 ++')
+		# 	label_composition._set_clinicalProceduresVoc(cda_object)
+		# 	label_composition._build_clinicalProcedures(cda_object)
+		# 	cp_lenght = label_composition._write_clinicalProceduresLabel()
+		# 	logger.info('-- Number of Y2 multilabels: [{}] --'.format(cp_lenght))
 
-		elif medicaltarget == 'y3':
-			logger.info('---------------------------------------------------------')
-			logger.info('++ Medical Target Y3 ++')
-			label_composition._set_destinationVoc(cda_object)
-			label_composition._build_Destination(cda_object)
-			d_lenght = label_composition._write_DestinationLabel()
-			logger.info('-- Number of Y3 multilabels: [{}] --'.format(d_lenght))
-		else:
-			logger.info('---------------------------------------------------------')
-			logger.warning('!!! Medical target did not selected !!!')
+		# elif medicaltarget == 'y3':
+		# 	logger.info('---------------------------------------------------------')
+		# 	logger.info('++ Medical Target Y3 ++')
+		# 	label_composition._set_destinationVoc(cda_object)
+		# 	label_composition._build_Destination(cda_object)
+		# 	d_lenght = label_composition._write_DestinationLabel()
+		# 	logger.info('-- Number of Y3 multilabels: [{}] --'.format(d_lenght))
+		# else:
+		# 	logger.info('---------------------------------------------------------')
+		# 	logger.warning('!!! Medical target did not selected !!!')
 
-		## End Counter to label Composition
-		time_labelcomposition = time.time() - counter_lc
-		logger.debug('* Label Composition Time: {} *'.format(time_labelcomposition))
+		# ## End Counter to label Composition
+		# time_labelcomposition = time.time() - counter_lc
+		# logger.debug('* Label Composition Time: {} *'.format(time_labelcomposition))
 
 		## End Counter to measure the application
 		time_execution = time.time() - counter_execution
