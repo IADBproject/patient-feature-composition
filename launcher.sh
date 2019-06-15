@@ -22,7 +22,7 @@ DATASET_Dir="healthData/"
 RAWDATA_NAME="PMSI-PACA"
 #SANDBOX="../healthData/sandbox-"$FEATURES_NAME
 SANDBOX="healthData/sandbox-"$FEATURES_NAME
-YEAR="2008"
+YEAR="2019"
 
 ###-----------------------------------------------------------------------------#
 ###		First Stage: Select features to build a Binary Patient phenotype

@@ -39,7 +39,6 @@ class cdaJSON:
 		self.sandbox = args[1]
 		self.year = args[2]
 
-
 	def _get_clinicalprocedures(self, id_record, num_procedures):
 		"""
 		Get the clinical procedures associated to each patient record.
@@ -81,24 +80,45 @@ class cdaJSON:
 		## Indexing by number of row patient record
 		record = icu_rsa.reindex([id_record])
 
-		### x1_demographics
-		x11 = record.iloc[:,3].astype('str').values	 	### AGE
-		x12 = record.iloc[:,9].astype('str').values		### DOB
-		x13 = record.iloc[:,33].astype('str').values	### Marital status
-		x14 = record.iloc[:,34].astype('str').values	### Ethnicity
+		# ### x1_demographics
+		# x11 = record.iloc[:,3].astype('str').values	 	### AGE
+		# x12 = record.iloc[:,9].astype('str').values		### DOB
+		# x13 = record.iloc[:,33].astype('str').values	### Marital status
+		# x14 = record.iloc[:,34].astype('str').values	### Ethnicity
+
+		# ### x2_admission_details
+		# x21 = record.iloc[:,27].astype('str').values	### admission_type
+		# x22 = record.iloc[:,28].astype('str').values	### admission_location
+		# x23 = record.iloc[:,29].astype('str').values	### discharge_location
+		# x24 = record.iloc[:,30].astype('str').values	### insurance
+		# x25 = record.iloc[:,8].astype('str').values		### expire_flag
+
+		# ### x3_hospitalization_details
+		# x35 = record.iloc[:,62].astype('str').values	### first_week
+		# x36 = record.iloc[:,63].astype('str').values	### first_week
+		# x37 = record.iloc[:,68].astype('str').values	### first_week
+		# x38 = record.iloc[:,85].astype('str').values	### first_week
+
+		x11 = record.iloc[:,2].astype('str').values	 	### AGE
+		x12 = record.iloc[:,8].astype('str').values		### DOB
+		x13 = record.iloc[:,32].astype('str').values	### Marital status
+		x14 = record.iloc[:,33].astype('str').values	### Ethnicity
 
 		### x2_admission_details
-		x21 = record.iloc[:,27].astype('str').values	### input_mode
-		x22 = record.iloc[:,28].astype('str').values	### input_source
-		x23 = record.iloc[:,29].astype('str').values	### previous_state
-		x24 = record.iloc[:,30].astype('str').values	### first_week
-		x25 = record.iloc[:,8].astype('str').values		### first_week
+		x21 = record.iloc[:,26].astype('str').values	### admission_type
+		x22 = record.iloc[:,27].astype('str').values	### admission_location
+		x23 = record.iloc[:,28].astype('str').values	### discharge_location
+		x24 = record.iloc[:,29].astype('str').values	### insurance
+		x25 = record.iloc[:,7].astype('str').values		### expire_flag
 
 		### x3_hospitalization_details
-		x35 = record.iloc[:,62].astype('str').values	### first_week
-		x36 = record.iloc[:,63].astype('str').values	### first_week
-		x37 = record.iloc[:,68].astype('str').values	### first_week
-		x38 = record.iloc[:,85].astype('str').values	### first_week
+		x35 = record.iloc[:,61].astype('str').values	### first_week
+		x36 = record.iloc[:,62].astype('str').values	### first_week
+		x37 = record.iloc[:,67].astype('str').values	### first_week
+		#x38 = record.iloc[:,84].astype('str').values	### first_week
+
+		### x7_associated_diagnosis
+		x71 =  json.dumps(record.iloc[:,84].values.tolist())
 
 		######################################################################
 		### Serialize each record to create a clinical document in JSON format
@@ -120,13 +140,14 @@ class cdaJSON:
 					'x3_hospitalization_details': {
 						'icu_first_careunit': x35[0],
 						'icu_last_careunit': x36[0],
-						'icu_los': x37[0],
-						'procedure': x38[0]
-					}
+						'icu_los': x37[0]
+					}# },
+					# 'x7_associated_diagnosis': {
+					# 	'procedure': x71[0]
+					# }
 				}
 
 		return cda_record
-    		
 
 	def cdaSchemaM24(self, icu_rsa, id_record):
 		#####################################################

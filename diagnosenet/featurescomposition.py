@@ -74,7 +74,8 @@ class FeaturesComposition:
 								}
 
 		## Clinical document structured in JSON format
-		self.cinical_document = json.dumps( features_serialized, sort_keys=True, indent=2, separators=(',', ': ') )
+		# Set indent=None to auto-generate a new line feed (\n) in json file using Python.
+		self.cinical_document = json.dumps( features_serialized, sort_keys=True, indent=None, separators=(',', ': ') )
 
 		## Used return 'cda_serialized' for working	with raw CDA in JSON format
 		#cda_serialized = self.cinical_document

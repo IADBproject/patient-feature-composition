@@ -1,11 +1,33 @@
 import pandas as pd
 
-df_tbl = pd.read_csv('healthData/MIMIC/2019/pt_adm_icu_outevs_charevs_290519.csv')
+df_tbl = pd.read_csv('healthData/MIMIC/2019/OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv')
 
-cols = df_tbl.columns
-cols_ind = [df_tbl.columns.get_loc(c) for c in cols if c in df_tbl]
 
-print(zip(cols, cols_ind))
+# Yields a tuple of index label and series for each row in the datafra,e
+for (index_label, row_series) in df_tbl.iterrows():
+    phrase = df_tbl.iloc[index_label,28]
+    if isinstance(phrase, str):
+        from string import maketrans 
+        chars_to_remove = " /``[]"
+        replace_by = '-_    '
+        trantab = maketrans(chars_to_remove, replace_by)
+        phrase =  phrase.translate(trantab)
+
+        df_tbl.iloc[index_label,28] = phrase
+
+        print('Row Index label : ', index_label)
+        print('Row Content as Series : ', row_series.values)
+        print(phrase)
+        print(df_tbl.iloc[index_label,28])
+
+df_tbl.to_csv('healthData/MIMIC/2019/res.csv')
+
+# cols = df_tbl.columns
+# cols_ind = [df_tbl.columns.get_loc(c) for c in cols if c in df_tbl]
+# print(zip(cols, cols_ind))
+
+# # dateparse = lambda x: pd.to_datetime(str(x), format='%Y-%m-%d %H:%M:%S', errors='coerce')
+
 
 #  [('Unnamed: 0', 0), ('ROW_ID', 1), ('SUBJECT_ID', 2), ('GENDER', 3), 
 # ('DOB', 4), ('DOD', 5), ('DOD_HOSP', 6), ('DOD_SSN', 7), ('EXPIRE_FLAG', 8), 

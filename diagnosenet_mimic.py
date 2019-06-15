@@ -65,13 +65,39 @@ class _dIAgnoseNET_DataMining:
 		logger.info('-- Sandbox directory: {} --'.format(self.sandbox))
 		logger.info('-- Year {} --'.format(self.year))
 
+	def get_tbl_header(self, filename):
+		"""
+		Get table header from cvs file
+		"""
+		return pd.read_csv(filename, index_col=0, nrows=0).columns.tolist()
+
+	### ### PMSI-PACA ICU load files used at the Intensive Care Unit
+	def load_and_clean_ICUData(self):
+		load_time = time.time()
+		
+		raw_data = 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
+		filename = self.Dir_rawdata+self.year+"/"+str(raw_data)
+		usecols = self.get_tbl_header(filename)
+		icu_rsa = pd.read_csv(filename, usecols=usecols)
+
+		# Clean data
+		for (index_label, row_series) in icu_rsa.iterrows():
+			icu_rsa.iloc[index_label,27] = self._clean_string(icu_rsa.iloc[index_label,27])
+			icu_rsa.iloc[index_label,28] = self._clean_string(icu_rsa.iloc[index_label,28])
+			icu_rsa.iloc[index_label,29] = self._clean_string(icu_rsa.iloc[index_label,29])
+			icu_rsa.iloc[index_label,33] = self._clean_string(icu_rsa.iloc[index_label,33])
+
+		icu_rsa.to_csv(self.Dir_rawdata+self.year+"/"+str(raw_data))
+
 	### PMSI-PACA ICU load files used at the Intensive Care Unit
 	def loadICUData(self):
 		load_time = time.time()
-		# raw_data = 'pt_adm_icu_outevs_charevs_290519.csv'
+		
 		raw_data = 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
-		icu_rsa=pd.read_csv(self.Dir_rawdata+self.year+"/"+str(raw_data),
-					header=0,sep=",",encoding='latin-1',dtype="str")
+		filename = self.Dir_rawdata+self.year+"/"+str(raw_data)
+		usecols = self.get_tbl_header(filename)
+		icu_rsa = pd.read_csv(self.Dir_rawdata+self.year+"/"+str(raw_data),
+					header=0,sep=",",encoding='latin-1',dtype="str", usecols=usecols)
 
 		### Merge SSR_fix with the new Primary Morbidty Composition 'Classes Disease Group'
 		#;primary_Composition=pd.merge(icu_rsa, code_diagnosis, left_on='affect_etiol', right_on='Diagnose')
@@ -82,6 +108,16 @@ class _dIAgnoseNET_DataMining:
 		##logger.info('-- Primary Composition: %s ---"% str(primary_Composition.shape) )
 		logger.debug('* Data load time: {} (SPY) *'.format((time.time() - load_time)))
 		return icu_rsa
+
+	def _clean_string(self, phrase):    
+		if isinstance(phrase, str):
+			from string import maketrans 
+			chars_to_remove = " /``[]"
+			replace_by = '-_    '
+			trantab = maketrans(chars_to_remove, replace_by)
+			phrase =  phrase.translate(trantab)
+
+		return phrase
 
 
 def main(argv):
@@ -299,7 +335,8 @@ def main(argv):
 		### Admission details
 		x2_name = ['admission_type', 'admission_location', 'discharge_location', 'insurance', 'expire_flag']
 		### Hospitalization details
-		x3_name = ['icu_first_careunit', 'icu_last_careunit', 'icu_los', 'procedure']
+		#x3_name = ['icu_first_careunit', 'icu_last_careunit', 'icu_los', 'procedure']
+		x3_name = ['icu_first_careunit', 'icu_last_careunit', 'icu_los']
 		# x4_name = ['dressing', 'feeding', 'displacement', 'continence' ]
 		x4_name=None
 		# x5_name = ['communication', 'comportement']
@@ -310,7 +347,8 @@ def main(argv):
 		#   		'bilans', 'physiotherapy', 'balneotherapy']
 		x6_name=None
 		##x7_name = ['x7_associated_diagnosis']
-		x7_name=None
+		x7_name = None
+		#x7_name = ['procedure']
 		##x8_name = ['care_purpose','morbidity','etiology','major_clinical_category']
 		x8_name=None
 		##x9_name = ['x9_clinical_procedures']
@@ -333,12 +371,14 @@ def main(argv):
 		### Starting _dIAgnoseNET_DataMining and load row data
 		dataminingDefault =  _dIAgnoseNET_DataMining(dataset_dir, features_name, rawdata_name, sandbox, year)
 		dataminingDefault.displayDirectories()
+
+		# Load and clean ICU data
+		icu_rsa = dataminingDefault.load_and_clean_ICUData() ## Get the PMSI-PACA ICU Data
 		icu_rsa = dataminingDefault.loadICUData() ## Get the PMSI-PACA ICU Data
 
 		## End counter to measure latency
 		latency = time.time() - counter_latency
 		logger.debug('* Latency: {} *'.format(latency))
-
 
 		#######################################################################
 		## Counter to Features Composition
@@ -348,9 +388,9 @@ def main(argv):
 
 		### Features Serializer in a Clinical Document Architecture as JSON formet
 		featurescomposition = FeaturesComposition(dataset_dir, features_name, sandbox, year)
-		cda_object = featurescomposition._write_featuresSerialized(icu_rsa)
-		print(cda_object)
-		#cda_object = featurescomposition._get_featuresSerialized(icu_rsa)
+		#cda_object = featurescomposition._write_featuresSerialized(icu_rsa)
+		cda_object = featurescomposition._get_featuresSerialized(icu_rsa)
+		#cda_object = featurescomposition._set_featuresSerializer(icu_rsa)
 
 		## The CDA features serialization to write one time
 		## Check if the clinical document exists
@@ -385,34 +425,35 @@ def main(argv):
 			vocabularycomposition = VocabularyComposition(dataset_dir, features_name, sandbox, year)
 			voc_x1,voc_x2,voc_x3,voc_x4,voc_x5,voc_x6,voc_x7,voc_x8,voc_x9,voc_x10 = vocabularycomposition._dynamic_Vocabulary(cda_object,
 										x1_name,x2_name,x3_name,x4_name,x5_name,x6_name,x7_name,x8_name,x9_name,x10_name)
+			#print(vocabularycomposition)
 			## Write dynamic vocabulary
+			# vocabularycomposition._write_Vocabulary(x1_name,x2_name,x3_name,x4_name,x5_name,x6_name,x7_name,x8_name,x9_name,x10_name)
 			vocabularycomposition._write_Vocabulary(x1_name,x2_name,x3_name,x4_name,x5_name,x6_name,x7_name,x8_name,x9_name,x10_name)
 
 		## End Counter to label Composition
 		time_vocabulary = time.time() - counter_vc
 		logger.debug('* Vocabulary Composition Time: {} *'.format(time_vocabulary))
 
+		# #######################################################################
+		## Counter to Binary representation include Vocabulary Load or Built
+		counter_br = time.time()
+
+		## Build a binary petient phenotype representation using Document-term Matrix
+		dtm = DocumentTermMatrix(dataset_dir, features_name, sandbox, year)
+		binarypatient = dtm._build_binaryPhenotype(cda_object,x1_name,x2_name,x3_name,
+						x4_name, x5_name, x6_name, x7_name, x8_name, x9_name, x10_name,
+						voc_x1,voc_x2,voc_x3,voc_x4,voc_x5,voc_x6,voc_x7,voc_x8,voc_x9,voc_x10)
+
+		len_BPPR = dtm._write_binaryPhenotype()
+		logger.info('-- Lenght of BPPR: [{}] --'.format(len_BPPR))
+
+		## End Counter to Binary representation
+		time_binaryrepresentation = time.time() - counter_br
+		logger.debug('* Binary Representation Time: {} *'.format(time_binaryrepresentation))
+
 
 		# #######################################################################
-		# ## Counter to Binary representation include Vocabulary Load or Built
-		# counter_br = time.time()
-
-		# ## Build a binary petient phenotype representation using Document-term Matrix
-		# dtm = DocumentTermMatrix(dataset_dir, features_name, sandbox, year)
-		# binarypatient = dtm._build_binaryPhenotype(cda_object,x1_name,x2_name,x3_name,
-		# 				x4_name, x5_name, x6_name, x7_name, x8_name, x9_name, x10_name,
-		# 				voc_x1,voc_x2,voc_x3,voc_x4,voc_x5,voc_x6,voc_x7,voc_x8,voc_x9,voc_x10)
-
-		# len_BPPR = dtm._write_binaryPhenotype()
-		# logger.info('-- Lenght of BPPR: [{}] --'.format(len_BPPR))
-
-		# ## End Counter to Binary representation
-		# time_binaryrepresentation = time.time() - counter_br
-		# logger.debug('* Binary Representation Time: {} *'.format(time_binaryrepresentation))
-
-
-		# #######################################################################
-		# ## Counter to label Composition
+		## Counter to label Composition
 		# counter_lc = time.time()
 
 		# ### Label Composition
@@ -448,10 +489,10 @@ def main(argv):
 		# time_labelcomposition = time.time() - counter_lc
 		# logger.debug('* Label Composition Time: {} *'.format(time_labelcomposition))
 
-		## End Counter to measure the application
-		time_execution = time.time() - counter_execution
-		logger.info('---------------------------------------------------------')
-		logger.debug('* Execution Time: {} *'.format(time_execution))
+		# ## End Counter to measure the application
+		# time_execution = time.time() - counter_execution
+		# logger.info('---------------------------------------------------------')
+		# logger.debug('* Execution Time: {} *'.format(time_execution))
 
 if __name__ == '__main__':
 	main(sys.argv[1:])

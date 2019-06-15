@@ -29,6 +29,9 @@ import nltk
 from nltk import FreqDist
 #nltk.download()
 
+## File Helper
+from utils.file_helper import FileHelper
+
 ## dIAgnoseNET library
 logger = logging.getLogger('_dIAgnoseNET_DataMining')
 
@@ -196,7 +199,7 @@ class VocabularyComposition:
 		"""
 		Tokenize and extract the vocabulary
 		"""
-
+ 
 		## Convert the age terms in String
 		raw_terms = str(' '.join(terms))
 
@@ -207,15 +210,12 @@ class VocabularyComposition:
 #		clean_values = raw_terms.translate(None, ''.join(chars_to_remove))
 #		print("clean_values %s " % clean_values.split())
 
-
 		## Tokenize the terms to create a vocabulary for each feature group
-		raw_tokens_terms = self.indexing_documents( raw_terms )
-		#print("+++ Raw tokens: %s  +++" % raw_tokens_age)
-
+		raw_tokens_terms = self.indexing_documents(raw_terms)
 		## Extract key terms for clean the Medical Vocabulary
 		voc_terms = list(dict.fromkeys(raw_tokens_terms))
 		voc_terms.sort()
-		vocabulary_terms = np.asarray(voc_terms, dtype='|S7')
+		vocabulary_terms = np.asarray(voc_terms, dtype='|S50')
 
 		return vocabulary_terms
 
@@ -239,9 +239,15 @@ class VocabularyComposition:
 		x10 = [] ## x10_destination
 
 		## Get list values by '__getattr_(json, key)' from ObjectJSON
+		# Convert json string to json object
+		#cda_object = json.loads(cda_object)
+		# Clinical doc
+		# #clinical_obj = cda_object['clinicalDocument']
+		# from utils.file_helper import FileHelper
+		# fname = '/Users/lion/Documents/py-workspare/tutorship/patient-feature-composition/cda.txt'
+		# FileHelper.save_text(fname, json.dumps(cda_object))
 		## append list values by EHR entity
 		for record_object in cda_object:
-
 			## x1_demographics
 			if (not x1_name) is False and x1_name[0] != 'None':
 				x1.append([(getattr(record_object.x1_demographics, i )) for i in x1_name])
@@ -255,6 +261,7 @@ class VocabularyComposition:
 			if (not x2_name) is False and x2_name[0] != 'None':
 				x2.append([(getattr(record_object.x2_admission_details, i)) for i in x2_name])
 				##print("\n++ Call admission details %s ++" % [ ( getattr(record_object.x2_admission_details, i) ) for i in x2_name])
+				print("\n++ Call x2 admission details %s ++" % x2)
 			else:
 				#logger.warning('!!! x2: Admission Details features are not being used as input !!!')
 				x2_name = None
@@ -264,6 +271,7 @@ class VocabularyComposition:
 			if (not x3_name) is False and x3_name[0] != 'None':
 				x3.append([(getattr(record_object.x3_hospitalization_details, i)) for i in x3_name])
 				##print("\n++ Call x3_hospitalization_details %s ++" % [(getattr(record_object.x3_hospitalization_details, i)) for i in x3_name])
+				print("\n++ Call x3_hospitalization_details %s ++" % x3)
 			else:
 				#logger.warning('!!! x3: Hospitalization details features are not being used as input !!!')
 				x3_name = None
@@ -403,7 +411,7 @@ class VocabularyComposition:
 		if (not x6_name) is False:
 			##voc_x6_rehabilitation_time = {}
 			for i in range(len(x6_name)):
-				self.voc_x6_rehabilitation_time[x6_name[i]] = ( self._set_dynamicVocabulary(x6_rehabilitation_time[x6_name[i]].tolist()))
+				self.voc_x6_rehabilitation_time[x6_name[i]] = (self._set_dynamicVocabulary(x6_rehabilitation_time[x6_name[i]].tolist()))
 			##print("vocx6_rehabilitation_time %s" % voc_x6_rehabilitation_time)
 		else:
 			self.voc_x6_rehabilitation_time = 0
@@ -415,7 +423,9 @@ class VocabularyComposition:
 			##voc_x7_associated_diagnosis = {}
 			#		x7_RD = []
 			for i in range(len(x7_name)):
-				self.voc_x7_associated_diagnosis[x7_name[i]] = (self._set_dynamicVocabulary(x7_associated_diagnosis['x7_associated_diagnosis']))
+    				
+				self.voc_x7_associated_diagnosis[x7_name[i]] = (self._set_dynamicVocabulary(x7_associated_diagnosis[x7_name[i]].tolist()))
+				#self.voc_x7_associated_diagnosis[x7_name[i]] = (self._set_dynamicVocabulary(x7_associated_diagnosis['x7_associated_diagnosis']))
 		else:
 			self.voc_x7_associated_diagnosis = 0
 			##print("+++ None: x7_associated_diagnosis +++")
@@ -463,7 +473,8 @@ class VocabularyComposition:
 			self.voc_x10_destination = 0
 			##print("+++ x10_destination +++")
 
-		##print( self.voc_x1_demographics, type(self.voc_x2_admission_details), type(self.voc_y1_primary_morbidity), type(self.voc_x3_related_diagnoses), type(self.voc_x4_physical_dependence), type(self.voc_x5_cognitive_dependence), type(self.voc_y2_clinical_procedures) )
+		#print( self.voc_x1_demographics, type(self.voc_x2_admission_details), type(self.voc_y1_primary_morbidity), type(self.voc_x3_related_diagnoses), type(self.voc_x4_physical_dependence), type(self.voc_x5_cognitive_dependence), type(self.voc_y2_clinical_procedures) )
+		print( self.voc_x1_demographics, type(self.voc_x2_admission_details))
 		return self.voc_x1_demographics, self.voc_x2_admission_details, self.voc_x3_hospitalization_details, self.voc_x4_physical_dependence, self.voc_x5_cognitive_dependence, self.voc_x6_rehabilitation_time,  self.voc_x7_associated_diagnosis, self.voc_x8_primary_morbidity, self.voc_x9_clinical_procedures , self.voc_x10_destination
 
 
@@ -478,8 +489,9 @@ class VocabularyComposition:
 		## x1_demographics
 		if (not x1_name) is False and x1_name[0] != 'None':
 			voc_x1_name = [','.join(str(value) for value in self.voc_x1_demographics[i] ) for i in x1_name]
-			file_voc = str(dynamic_dir)+str("vocabulary-x1_demographics-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x1_name, delimiter=',', fmt='%s')
+			file_voc = './' + str(dynamic_dir)+str("vocabulary-x1_demographics-")+self.features_name+"-"+self.year+(".txt")
+			FileHelper.save_arraytotext(file_voc, voc_x1_name)
+			#np.savetxt(file_voc, voc_x1_name, delimiter=',', fmt='%s')
 		else:
 			voc_x1_name = 0
 
@@ -487,7 +499,8 @@ class VocabularyComposition:
 		if (not x2_name) is False and x2_name[0] != 'None':
 			voc_x2_name = [','.join(str(value) for value in self.voc_x2_admission_details[i] ) for i in x2_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x2_admission_details-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x2_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x2_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x2_name)
 		else:
 			voc_x2_name = 0
 
@@ -495,7 +508,8 @@ class VocabularyComposition:
 		if (not x3_name) is False and x3_name[0] != 'None':
 			voc_x3_name = [','.join(str(value) for value in self.voc_x3_hospitalization_details[i] ) for i in x3_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x3_hospitalization_details-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x3_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x3_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x3_name)
 		else:
 			voc_x3_name = 0
 
@@ -503,7 +517,8 @@ class VocabularyComposition:
 		if (not x4_name) is False and x4_name[0] != 'None':
 			voc_x4_name = [','.join(str(value) for value in self.voc_x4_physical_dependence[i] ) for i in x4_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x4_physical_dependence-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x4_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x4_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x4_name)
 		else:
 			voc_x4_name = 0
 
@@ -511,7 +526,8 @@ class VocabularyComposition:
 		if (not x5_name) is False and x5_name[0] != 'None':
 			voc_x5_name = [','.join(str(value) for value in self.voc_x5_cognitive_dependence[i] ) for i in x5_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x5_cognitive_dependence-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x5_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x5_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x5_name)
 		else:
 			voc_x5_name = 0
 
@@ -519,7 +535,8 @@ class VocabularyComposition:
 		if (not x6_name) is False and x6_name[0] != 'None':
 			voc_x6_name = [','.join(str(value) for value in self.voc_x6_rehabilitation_time[i] ) for i in x6_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x6_rehabilitation_time-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x6_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x6_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x6_name)
 		else:
 			voc_x5_name = 0
 
@@ -527,7 +544,8 @@ class VocabularyComposition:
 		if (not x7_name) is False and x7_name[0] != 'None':
 			voc_x7_name = [','.join(str(value) for value in self.voc_x7_associated_diagnosis[i] ) for i in x7_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x7_associated_diagnosis-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x7_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x7_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x7_name)
 		else:
 			voc_x7_name = 0
 
@@ -535,7 +553,8 @@ class VocabularyComposition:
 		if (not x8_name) is False and x8_name[0] != 'None':
 			voc_x8_name = [','.join(str(value) for value in self.voc_x8_primary_morbidity[i] ) for i in x8_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x8_primary_morbidity-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x8_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x8_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x8_name)
 		else:
 			voc_x8_name = 0
 
@@ -543,7 +562,8 @@ class VocabularyComposition:
 		if (not x9_name) is False and x9_name[0] != 'None':
 			voc_x9_name = [','.join(str(value) for value in self.voc_x9_clinical_procedures[i] ) for i in x9_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x9_clinical_procedures-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x9_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x9_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x9_name)
 		else:
 			voc_x9_name = 0
 
@@ -551,7 +571,8 @@ class VocabularyComposition:
 		if (not x10_name) is False and x10_name[0] != 'None':
 			voc_x10_name = [','.join(str(value) for value in self.voc_x10_destination[i] ) for i in x10_name]
 			file_voc = str(dynamic_dir)+str("vocabulary-x10_destination-")+self.features_name+"-"+self.year+(".txt")
-			np.savetxt(file_voc, voc_x10_name, delimiter=',', fmt='%s')
+			#np.savetxt(file_voc, voc_x10_name, delimiter=',', fmt='%s')
+			FileHelper.save_arraytotext(file_voc, voc_x10_name)
 		else:
 			voc_x10_name = 0
 
