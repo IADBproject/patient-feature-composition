@@ -262,7 +262,7 @@ class LabelComposition:
 		Set clinical procedures to concatenate all the procedures associated to one record
 		"""
 		### Features by electronic health record entity
-		if not x10_name: x10_name = ['output_mode']
+		if not x10_name: x10_name = ['length_of_stay']
 
 		### Buil a clinical_proceduresy labels
 		for record_object in cda_object:
@@ -299,7 +299,7 @@ class LabelComposition:
 		logger.info('-- Build a One-Hot Vector for Destination Multilabel --')
 
 		### Features by electronic health record entity
-		if not x10_name: x10_name = ['output_mode']
+		if not x10_name: x10_name = ['length_of_stay']
 
 		### Get the primary morbidity representation values 'self.pm_Dictionary.values()' to build a 'one-hot vector' as target
 		### len of vector is equal to number of prmary morbidty representation values
@@ -307,7 +307,6 @@ class LabelComposition:
 		vocabulary_label.sort()
 		#logger.info('-- Number of clinical procedures multilabels in One-hot Vector: [{}]'.format(len(vocabulary_label)))
 		self.d_lenght = len(vocabulary_label)
-
 
 		for record_label in cda_object:
 			x10_elements = [(getattr(record_label.x10_destination, i)) for i in x10_name]

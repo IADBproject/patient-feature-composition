@@ -305,7 +305,6 @@ def main(argv):
 		##np.savetxt(tesbed_file,time_counters.T, delimiter=',', fmt='%s')
 		##logger.info('-- Testbed Directory: {} *'.format(tesbed_file))
 
-
 	### Using default directory "healthData/sandbox-pre-trained"
 	else:
 		#######################################################################
@@ -326,7 +325,8 @@ def main(argv):
 		#vocabulary_type = "custom"
 		vocabulary_type = None
 		##vocabulary_type = "None"
-		medicaltarget = 'y1'
+		#medicaltarget = 'y1'
+		medicaltarget = 'y3'
 
 		#######################################################################
 		### Select the features to build a binary patient phenotype
@@ -354,7 +354,8 @@ def main(argv):
 		##x9_name = ['x9_clinical_procedures']
 		x9_name=None
 		#x10_name = ['last_week','output_mode','destination']
-		x10_name=None
+		#x10_name = None
+		x10_name = ['length_of_stay']
 
 		#######################################################################
 		### Set general logging configuration for using in _dIAgnoseNET_DataMining
@@ -404,7 +405,6 @@ def main(argv):
 		time_featurescomposition = time.time() - counter_fc
 		logger.debug('* Features Composition Time: {} *'.format(time_featurescomposition))
 
-
 		# #######################################################################
 		# ## Counter to Vocabulary Composition
 		counter_vc = time.time()
@@ -451,13 +451,24 @@ def main(argv):
 		time_binaryrepresentation = time.time() - counter_br
 		logger.debug('* Binary Representation Time: {} *'.format(time_binaryrepresentation))
 
-
 		# #######################################################################
-		## Counter to label Composition
-		# counter_lc = time.time()
+		# Counter to label Composition
+		counter_lc = time.time()
 
 		# ### Label Composition
-		# label_composition = LabelComposition(features_name, sandbox, year)
+		label_composition = LabelComposition(features_name, sandbox, year)
+
+		if medicaltarget == 'y3':
+			logger.info('---------------------------------------------------------')
+			logger.info('++ Medical Target Y3 ++')
+			label_composition._set_destinationVoc(cda_object)
+			label_composition._build_Destination(cda_object)
+			d_lenght = label_composition._write_DestinationLabel()
+			logger.info('-- Number of Y3 multilabels: [{}] --'.format(d_lenght))
+		else:
+			logger.info('---------------------------------------------------------')
+			logger.warning('!!! Medical target did not selected !!!')
+
 		# if medicaltarget == 'y1':
 		# 	logger.info('---------------------------------------------------------')
 		# 	logger.info('++ Medical Target Y1 ++')

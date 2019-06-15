@@ -120,6 +120,9 @@ class cdaJSON:
 		### x7_associated_diagnosis
 		x71 =  json.dumps(record.iloc[:,84].values.tolist())
 
+		### 
+		x101 = record.iloc[:,67].astype('str').values	### destination
+
 		######################################################################
 		### Serialize each record to create a clinical document in JSON format
 		### SSR_Methodologique_2016
@@ -141,10 +144,13 @@ class cdaJSON:
 						'icu_first_careunit': x35[0],
 						'icu_last_careunit': x36[0],
 						'icu_los': x37[0]
-					}# },
+					},# },
 					# 'x7_associated_diagnosis': {
 					# 	'procedure': x71[0]
 					# }
+					"x10_destination":{
+						"length_of_stay": x101[0]
+					}
 				}
 
 		return cda_record
