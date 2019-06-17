@@ -4,3 +4,5 @@ healthData/PMSI-PACA/*
 healthData/vocabularies_repository/*
 healthData/*
 diagnosenet/*.pyc
+
+index_col_tbl.py

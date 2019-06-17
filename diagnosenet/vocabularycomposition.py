@@ -13,7 +13,7 @@ from __future__ import print_function
 import os, sys
 import numpy as np
 import pandas as pd
-import time
+import time, math
 import logging
 import glob
 
@@ -306,6 +306,7 @@ class VocabularyComposition:
 
 			## x7_associated_diagnosis
 			if (not x7_name) is False and x7_name[0] != 'None':
+				print("++ Call Related Diagnostics %s ++" %  json.dumps(record_object))
 				x7.append(record_object.x7_associated_diagnosis)
 				#print("++ Call Related Diagnostics %s ++" %  record_object.x7_associated_diagnosis)
 			else:
@@ -351,6 +352,7 @@ class VocabularyComposition:
 		x7_associated_diagnosis = pd.DataFrame(x7, columns=x7_name)
 		x8_primary_morbidity = pd.DataFrame(x8, columns=x8_name)
 		x9_clinical_procedures = pd.DataFrame(x9, columns=x9_name)
+
 		x10_destination = pd.DataFrame(x10, columns=x10_name)
 
 		## Set vocabulary by each feature index 'x1_name['age','sexe','activity']'

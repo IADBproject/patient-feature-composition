@@ -11,7 +11,7 @@ from __future__ import print_function
 import os, sys
 import numpy as np
 import pandas as pd
-import time
+import time, math
 import logging
 
 ## dIAgnoseNET library
@@ -75,17 +75,25 @@ class _dIAgnoseNET_DataMining:
 	def load_and_clean_ICUData(self):
 		load_time = time.time()
 		
-		raw_data = 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
+		raw_data = '700_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'20_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
 		filename = self.Dir_rawdata+self.year+"/"+str(raw_data)
 		usecols = self.get_tbl_header(filename)
 		icu_rsa = pd.read_csv(filename, usecols=usecols)
 
 		# Clean data
 		for (index_label, row_series) in icu_rsa.iterrows():
-			icu_rsa.iloc[index_label,27] = self._clean_string(icu_rsa.iloc[index_label,27])
-			icu_rsa.iloc[index_label,28] = self._clean_string(icu_rsa.iloc[index_label,28])
-			icu_rsa.iloc[index_label,29] = self._clean_string(icu_rsa.iloc[index_label,29])
-			icu_rsa.iloc[index_label,33] = self._clean_string(icu_rsa.iloc[index_label,33])
+			# icu_rsa.iloc[index_label,27] = self._clean_string(icu_rsa.iloc[index_label,27])
+			# icu_rsa.iloc[index_label,28] = self._clean_string(icu_rsa.iloc[index_label,28])
+			# icu_rsa.iloc[index_label,29] = self._clean_string(icu_rsa.iloc[index_label,29])
+			# icu_rsa.iloc[index_label,33] = self._clean_string(icu_rsa.iloc[index_label,33])
+			icu_rsa.iloc[index_label,18] = self._clean_string(icu_rsa.iloc[index_label,18])
+			icu_rsa.iloc[index_label,34] = self._clean_string(icu_rsa.iloc[index_label,34])
+			icu_rsa.iloc[index_label,55] = self._clean_string(icu_rsa.iloc[index_label,55])
+			icu_rsa.iloc[index_label,66] = self._clean_string(icu_rsa.iloc[index_label,66])
+			icu_rsa.iloc[index_label,44] = self._clean_string(icu_rsa.iloc[index_label,44])
+			# Convert Float to integer
+			icu_rsa.iloc[index_label,68] = self._float_to_int(icu_rsa.iloc[index_label,68])
+
 
 		icu_rsa.to_csv(self.Dir_rawdata+self.year+"/"+str(raw_data))
 
@@ -93,7 +101,7 @@ class _dIAgnoseNET_DataMining:
 	def loadICUData(self):
 		load_time = time.time()
 		
-		raw_data = 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
+		raw_data = '700_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'20_OUT_NUM_EVENTS_WINSIZE_24H.csv' # 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
 		filename = self.Dir_rawdata+self.year+"/"+str(raw_data)
 		usecols = self.get_tbl_header(filename)
 		icu_rsa = pd.read_csv(self.Dir_rawdata+self.year+"/"+str(raw_data),
@@ -118,6 +126,14 @@ class _dIAgnoseNET_DataMining:
 			phrase =  phrase.translate(trantab)
 
 		return phrase
+	
+	def _float_to_int(self, number):
+		if isinstance(number, float):
+			try:
+				number = int(math.ceil(number))
+			except ValueError:
+				number = 0
+		return number
 
 
 def main(argv):
@@ -176,7 +192,6 @@ def main(argv):
 		latency = time.time() - counter_latency
 		logger.debug('* Latency: {} *'.format(latency))
 
-
 		#######################################################################
 		## Counter to Features Composition
 		counter_fc = time.time()
@@ -199,7 +214,6 @@ def main(argv):
 		## End counter to Features Composition
 		time_featurescomposition = time.time() - counter_fc
 		logger.debug('* Features Composition Time: {} *'.format(time_featurescomposition))
-
 
 		#######################################################################
 		## Counter to Vocabulary Composition
@@ -233,7 +247,6 @@ def main(argv):
 		## End Counter to label Composition
 		time_vocabulary = time.time() - counter_vc
 		logger.debug('* Vocabulary Composition Time: {} *'.format(time_vocabulary))
-
 
 		#######################################################################
 		## Counter to Binary representation include Vocabulary Load or Built
@@ -336,7 +349,7 @@ def main(argv):
 		x2_name = ['admission_type', 'admission_location', 'discharge_location', 'insurance', 'expire_flag']
 		### Hospitalization details
 		#x3_name = ['icu_first_careunit', 'icu_last_careunit', 'icu_los', 'procedure']
-		x3_name = ['icu_first_careunit', 'icu_last_careunit', 'icu_los']
+		x3_name = ['icu_first_careunit', 'icu_last_careunit']
 		# x4_name = ['dressing', 'feeding', 'displacement', 'continence' ]
 		x4_name=None
 		# x5_name = ['communication', 'comportement']
