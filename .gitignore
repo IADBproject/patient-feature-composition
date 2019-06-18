@@ -6,3 +6,4 @@ healthData/*
 diagnosenet/*.pyc
 
 index_col_tbl.py
+test.py

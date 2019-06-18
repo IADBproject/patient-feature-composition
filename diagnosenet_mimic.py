@@ -75,7 +75,7 @@ class _dIAgnoseNET_DataMining:
 	def load_and_clean_ICUData(self):
 		load_time = time.time()
 		
-		raw_data = '700_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'20_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
+		raw_data = '20_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'20_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
 		filename = self.Dir_rawdata+self.year+"/"+str(raw_data)
 		usecols = self.get_tbl_header(filename)
 		icu_rsa = pd.read_csv(filename, usecols=usecols)
@@ -91,6 +91,7 @@ class _dIAgnoseNET_DataMining:
 			icu_rsa.iloc[index_label,55] = self._clean_string(icu_rsa.iloc[index_label,55])
 			icu_rsa.iloc[index_label,66] = self._clean_string(icu_rsa.iloc[index_label,66])
 			icu_rsa.iloc[index_label,44] = self._clean_string(icu_rsa.iloc[index_label,44])
+			icu_rsa.iloc[index_label,50] = self._clean_string(icu_rsa.iloc[index_label,50])
 			# Convert Float to integer
 			icu_rsa.iloc[index_label,68] = self._float_to_int(icu_rsa.iloc[index_label,68])
 
@@ -101,7 +102,7 @@ class _dIAgnoseNET_DataMining:
 	def loadICUData(self):
 		load_time = time.time()
 		
-		raw_data = '700_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'20_OUT_NUM_EVENTS_WINSIZE_24H.csv' # 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
+		raw_data = '20_OUT_NUM_EVENTS_WINSIZE_24H.csv' #'20_OUT_NUM_EVENTS_WINSIZE_24H.csv' # 'OUT_LIMIT_NUM_EVENTS_WINSIZE_24H.csv'
 		filename = self.Dir_rawdata+self.year+"/"+str(raw_data)
 		usecols = self.get_tbl_header(filename)
 		icu_rsa = pd.read_csv(self.Dir_rawdata+self.year+"/"+str(raw_data),
@@ -120,8 +121,8 @@ class _dIAgnoseNET_DataMining:
 	def _clean_string(self, phrase):    
 		if isinstance(phrase, str):
 			from string import maketrans 
-			chars_to_remove = " /``[]"
-			replace_by = '-_    '
+			chars_to_remove = " /``[]()"
+			replace_by = '-_    _-'
 			trantab = maketrans(chars_to_remove, replace_by)
 			phrase =  phrase.translate(trantab)
 
@@ -402,8 +403,8 @@ def main(argv):
 
 		### Features Serializer in a Clinical Document Architecture as JSON formet
 		featurescomposition = FeaturesComposition(dataset_dir, features_name, sandbox, year)
-		#cda_object = featurescomposition._write_featuresSerialized(icu_rsa)
-		cda_object = featurescomposition._get_featuresSerialized(icu_rsa)
+		cda_object = featurescomposition._write_featuresSerialized(icu_rsa)
+		#cda_object = featurescomposition._get_featuresSerialized(icu_rsa)
 		#cda_object = featurescomposition._set_featuresSerializer(icu_rsa)
 
 		## The CDA features serialization to write one time

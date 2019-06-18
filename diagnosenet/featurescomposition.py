@@ -129,7 +129,21 @@ class FeaturesComposition:
 			f.write(self.cinical_document)
 		logger.info('-- Path of CDA Records: {}--'.format(file_name))
 
-		return self.cinical_document
+
+		## Reading 'self.clinical_document' in memory all records serialized in a CDA JSON format
+		json_cda = json.loads(self.cinical_document )
+		#print("+++ json_cda %s  " % json_cda)
+
+		## Encapsulation of 'cda_object'
+		## for bundling the 'self.clinical_document in a ObjectJSON Class
+		cda_object = []
+
+		## Encapsulates record by record
+		for record in json_cda["clinicalDocument"]:
+			cda_object.append( ObjectJSON(record) )
+
+		#return self.cinical_document
+		return cda_object
 
 
 	def _read_featuresSerialized(self):
